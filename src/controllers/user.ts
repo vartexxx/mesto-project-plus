@@ -4,6 +4,7 @@ import {
   ERROR_BAD_REQUEST,
   ERROR_NOT_FOUND,
   ERROR_SERVER,
+  STATUS_CREATED,
   STATUS_OK,
 } from '../utils/statusCode';
 
@@ -16,8 +17,13 @@ export const createUser = (req: Request, res: Response): void => {
   const { name, about, avatar }: any = req.body;
   console.log(req.body);
   user.create({ name, about, avatar })
-    .then((newUser) => res.status(STATUS_OK).send(newUser))
-    .catch(() => res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' }));
+    .then((newUser) => res.status(STATUS_CREATED).send(newUser))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      }
+      return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
+    });
 };
 
 export const updateUser = (req: any, res: Response): void => {
