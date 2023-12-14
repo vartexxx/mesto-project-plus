@@ -31,7 +31,7 @@ export const deleteCard = (req: Request, res: Response): void => {
     .then((cardInformation) => res.status(STATUS_OK).send(cardInformation))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена.' });
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Карточка с указанным _id не найдена.' });
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });
@@ -67,7 +67,7 @@ export const deleteLikeCard = (req: any, res: Response): void => {
         return res.status(ERROR_BAD_REQUEST).send({ message: ' Переданы некорректные данные для снятия лайка.' });
       }
       if (err.name === 'CastError') {
-        return res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Передан несуществующий _id карточки.' });
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });

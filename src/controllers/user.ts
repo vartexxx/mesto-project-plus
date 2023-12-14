@@ -41,7 +41,7 @@ export const updateUser = (req: any, res: Response): void => {
         return res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       }
       if (err.name === 'CastError') {
-        return res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });
@@ -71,7 +71,7 @@ export const getUser = (req: Request, res: Response): void => {
     .then((userInformation) => res.status(STATUS_OK).send(userInformation))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });
