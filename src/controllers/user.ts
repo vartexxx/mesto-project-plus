@@ -1,27 +1,49 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import user from '../models/user';
 import {
   ERROR_BAD_REQUEST,
   ERROR_SERVER,
-  STATUS_CREATED,
   STATUS_OK,
 } from '../utils/statusCode';
+import AlreadyExists from '../utils/errors/AlreadyExists';
+import BadRequest from '../utils/errors/BadRequest';
 
-export const getUsers = (req: Request, res: Response): void => {
+export const getUsers = (_req: Request, res: Response): void => {
   user.find({}).then((users) => res.status(STATUS_OK).send(users))
     .catch(() => res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' }));
 };
 
-export const createUser = (req: Request, res: Response): void => {
-  const { name, about, avatar }: any = req.body;
-  console.log(req.body);
-  user.create({ name, about, avatar })
-    .then((newUser) => res.status(STATUS_CREATED).send(newUser))
+export const createUser = (req: Request, res: Response, next: NextFunction): void => {
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  }: any = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => user.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((userInformation) => {
+      res.send({
+        _id: userInformation._id,
+        name: userInformation.name,
+        about: userInformation.about,
+        avatar: userInformation.avatar,
+        email: userInformation.email,
+      });
+    })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.code === 11000) {
+        next(new AlreadyExists('Пользователь с таким email уже существует'));
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+      } else {
+        next(err);
       }
-      return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });
 };
 
@@ -74,4 +96,15 @@ export const getUser = (req: Request, res: Response): void => {
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });
+};
+
+export const login = (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { email, password } = req.body;
+  return user.findUserByCredentials(email, password)
+    .then((body): void => {
+      res.send({
+        token: jwt.sign({ _id: body._id }, 'super-strong-secret', { expiresIn: '7d' }),
+      });
+    })
+    .catch(next);
 };
