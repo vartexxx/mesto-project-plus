@@ -98,6 +98,19 @@ export const getUser = (req: Request, res: Response): void => {
     });
 };
 
+export const getCurrentUser = (req: Request, res: Response, next: NextFunction) => {
+  // @ts-ignore
+  user.findById(req.user._id)
+    .then((userInfo) => {
+      if (!userInfo) {
+        throw new BadRequest('Пользователь по указанному _id не найден');
+      } else {
+        res.send(userInfo);
+      }
+    })
+    .catch(next);
+};
+
 export const login = (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { email, password } = req.body;
   return user.findUserByCredentials(email, password)
