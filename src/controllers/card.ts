@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import card from '../models/card';
 import {
   ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
   ERROR_SERVER,
   STATUS_CREATED,
   STATUS_OK,
@@ -46,7 +45,7 @@ export const addLikeCard = (req: any, res: Response): void => {
     .then((cardInformation) => res.status(STATUS_OK).send(cardInformation))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Передан несуществующий _id карточки.' });
       }
       if (err.name === 'ValidationError') {
         return res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки лайка.' });

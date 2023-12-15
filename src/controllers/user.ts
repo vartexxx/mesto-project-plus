@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import user from '../models/user';
 import {
   ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
   ERROR_SERVER,
   STATUS_CREATED,
   STATUS_OK,
@@ -60,7 +59,7 @@ export const updateUserAvatar = (req: any, res: Response): void => {
         return res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       }
       if (err.name === 'CastError') {
-        return res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
+        return res.status(ERROR_BAD_REQUEST).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       return res.status(ERROR_SERVER).send({ message: 'Ошибка со стороны сервера.' });
     });
