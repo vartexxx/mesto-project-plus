@@ -1,25 +1,25 @@
 import { Joi, celebrate, Segments } from 'celebrate';
 import { isValidObjectId } from 'mongoose';
-import BadRequest from "./errors/BadRequest";
+import BadRequest from './errors/BadRequest';
 
-const EMAIL_VALIDATION = Joi.string().required().email().messages({
+const EMAIL_VALIDATION: Joi.StringSchema = Joi.string().required().email().messages({
   'any.required': 'Email обязателен',
   'string.empty': 'Email не может быть пустым',
 });
-const PASSWORD_VALIDATION = Joi.string().required().messages({
+const PASSWORD_VALIDATION: Joi.StringSchema = Joi.string().required().messages({
   'any.required': 'Пароль обязателен',
   'string.empty': 'Пароль не может быть пустым',
 });
 
-const NAME_VALIDATION = Joi.string().min(2).max(30).messages({
+const NAME_VALIDATION: Joi.StringSchema = Joi.string().min(2).max(30).messages({
   'string.min': 'Имя не может быть короче 2 символов',
   'string.max': 'Имя не может быть длиннее 30 символов',
 });
-const ABOUT_VALIDATION = Joi.string().min(2).max(30).messages({
+const ABOUT_VALIDATION: Joi.StringSchema = Joi.string().min(2).max(30).messages({
   'string.min': 'About не может быть короче 2 символов',
   'string.max': 'About не может быть длиннее 30 символов',
 });
-const AVATAR_VALIDATION = Joi.string().pattern(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/).messages({
+const AVATAR_VALIDATION: Joi.StringSchema = Joi.string().pattern(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/).messages({
   'string.pattern.base': 'Некорректная ссылка',
 });
 
@@ -40,7 +40,7 @@ export const createUserValidation = celebrate({
   }),
 });
 
-const ID_VALIDATION = Joi.string().required().custom((value) => {
+const ID_VALIDATION: Joi.StringSchema = Joi.string().required().custom((value) => {
   if (isValidObjectId(value)) {
     return value;
   }
@@ -66,7 +66,7 @@ export const updateUserAvatarValidation = celebrate({
   }),
 });
 
-const LINK_VALIDATION = Joi.string().required().messages({
+const LINK_VALIDATION: Joi.StringSchema = Joi.string().required().messages({
   'any.required': 'Ссылка обязательна',
 });
 

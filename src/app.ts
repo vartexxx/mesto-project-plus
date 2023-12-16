@@ -17,10 +17,9 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(helmet());
+app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(requestLogger);
 
 app.post('/signin', signinValidation, login);
 app.post('/signup', createUserValidation, createUser);
