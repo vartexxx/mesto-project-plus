@@ -1,5 +1,6 @@
 import { Joi, celebrate, Segments } from 'celebrate';
 import { isValidObjectId } from 'mongoose';
+import BadRequest from "./errors/BadRequest";
 
 const EMAIL_VALIDATION = Joi.string().required().email().messages({
   'any.required': 'Email обязателен',
@@ -38,3 +39,30 @@ export const createUserValidation = celebrate({
     avatar: AVATAR_VALIDATION,
   }),
 });
+
+const ID_VALIDATION = Joi.string().required().custom((value) => {
+  if (isValidObjectId(value)) {
+    return value;
+  }
+  return new BadRequest('Запрашиваемый id неправильный или не существует.');
+}, 'Id validation');
+
+export const getUserValidation = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    userId: ID_VALIDATION,
+  }),
+});
+
+export const updateUserValidation = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: NAME_VALIDATION,
+    about: ABOUT_VALIDATION,
+  }),
+});
+
+export const updateUserAvatarValidation = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    avatar: AVATAR_VALIDATION.required(),
+  }),
+});
+
