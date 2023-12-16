@@ -1,18 +1,20 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import validator from 'validator';
+import { NextFunction } from 'express';
+import Unathorized from '../utils/errors/Unathorized';
 
 interface IUser {
   email: string,
   password: string,
-  name: string,
-  about: string,
-  avatar: string,
+  name?: string,
+  about?: string,
+  avatar?: string,
 }
 
 interface IUserModel extends mongoose.Model<IUser>{
   // eslint-disable-next-line max-len,no-unused-vars
-  findUserByCredentials: (email: string, password: string) => Promise<mongoose.Document<unknown, any, IUser>>
+  findUserByCredentials: (email: string, password: string, next: NextFunction) => Promise<mongoose.Document<unknown, any, IUser>>
 }
 
 const userSchema = new mongoose.Schema({
@@ -56,12 +58,12 @@ userSchema.static('findUserByCredentials', function findUserByCredentials(email:
   return this.findOne({ email }).select('+password')
     .then((user: any) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return Promise.reject(new Unathorized('Неправильные почта или пароль.'));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(new Unathorized('Неправильные почта или пароль.'));
           }
           return user;
         });

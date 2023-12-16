@@ -10,6 +10,7 @@ import {
 } from '../utils/statusCode';
 import BadRequest from '../utils/errors/BadRequest';
 import Forbidden from '../utils/errors/Forbidden';
+import NotFound from '../utils/errors/NotFound';
 
 export const getCards = (_req: Request, res: Response, next: NextFunction): void => {
   card.find({})
@@ -24,16 +25,17 @@ export const createCard = (req: any, res: Response, next: NextFunction): void =>
     .catch((err): void => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при создании карточки.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction): void => {
-  card.findByIdAndRemove(req.params.cardId)
+  card.findById(req.params.cardId)
     .then((cardInfo) => {
       if (!cardInfo) {
-        throw new BadRequest('Карточка по указанному _id не найдена.');
+        throw new NotFound('Карточка по указанному _id не найдена.');
       } // @ts-ignore
       if (cardInfo.owner.toString() !== req.user._id) {
         throw new Forbidden('Нельзя удалить чужую карточку.');
@@ -47,8 +49,9 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction): voi
     .catch((err): void => {
       if (err.name === 'CastError') {
         next(new BadRequest('Передан несуществующий _id'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -60,15 +63,16 @@ export const addLikeCard = (req: any, res: Response, next:NextFunction): void =>
   )
     .then((cardInfo) => {
       if (!cardInfo) {
-        throw new BadRequest('Карточку по указанному _id не найдена.');
+        throw new NotFound('Карточку по указанному _id не найдена.');
       }
       res.status(STATUS_OK).send(cardInfo);
     })
     .catch((err): void => {
       if (err.name === 'CastError') {
         next(new BadRequest('Передан несуществующий _id карточки.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -80,14 +84,15 @@ export const deleteLikeCard = (req: any, res: Response, next: NextFunction): voi
   )
     .then((cardInfo) => {
       if (!cardInfo) {
-        throw new BadRequest('Карточка по указанному _id не найдена.');
+        throw new NotFound('Карточка по указанному _id не найдена.');
       }
       res.status(STATUS_OK).send(cardInfo);
     })
     .catch((err): void => {
       if (err.name === 'CastError') {
         next(new BadRequest('Передан несуществующий _id карточки.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
