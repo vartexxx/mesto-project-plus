@@ -66,3 +66,19 @@ export const updateUserAvatarValidation = celebrate({
   }),
 });
 
+const LINK_VALIDATION = Joi.string().required().messages({
+  'any.required': 'Ссылка обязательна',
+});
+
+export const createCardValidation = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: NAME_VALIDATION,
+    link: LINK_VALIDATION,
+  }),
+});
+
+export const cardValidation = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: ID_VALIDATION,
+  }),
+});
